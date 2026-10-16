@@ -1,0 +1,8 @@
+1,The Art of Hive,2015-03-15
+2,Mastering Hadoop,2016-07-22
+3,Big Data Basics,2017-11-09
+4,Data Lake Deep Dive,2018-01-10
+5,Hadoop in Action,2019-08-17
+6,Learning Spark,2020-02-11
+7,Modern Data Architecture,2021-04-19
+8,Advanced HiveQL,2022-07-07

@@ -1,0 +1,5 @@
+101,Learn Hive,2014-03-01
+102,Hadoop in Practice,2015-05-16
+103,Big Data 101,2016-10-12
+104,Data Lakes Unleashed,2017-02-21
+105,Hive Performance Tuning,2018-06-30
