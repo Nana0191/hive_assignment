@@ -1,0 +1,75 @@
+docker compose up -d
+##in powershell
+cd E:\mapreduce_handson
+docker compose up -d mysql
+docker start hadoop-hive
+docker exec -it hadoop-hive bash
+ls -l /mnt/import
+head -3 /mnt/import/books.txt
+hive
+##first sql command
+CREATE TABLE books (id INT, title STRING, publishDate STRING)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+
+
+LOAD DATA LOCAL INPATH '/mnt/import/books.txt' INTO TABLE books;
+SELECT * FROM books WHERE id = 2;
+
+!hdfs dfs -mkdir -p /user/hive/purchases_data;
+
+CREATE EXTERNAL TABLE purchases (id INT, buyer STRING, purchaseDate STRING)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION '/user/hive/purchases_data';
+LOAD DATA LOCAL INPATH '/mnt/import/purchases.txt' INTO TABLE purchases;
+SELECT * FROM purchases LIMIT 5;
+
+CREATE TABLE books_purchases (id INT, title STRING, buyer STRING, purchaseDate STRING);
+
+INSERT INTO TABLE books_purchases
+SELECT b.id, b.title, p.buyer, p.purchaseDate
+FROM books b JOIN purchases p ON b.id = p.id;
+
+DROP TABLE purchases;
+!hdfs dfs -rm -r -f /user/hive/purchases_data;
+!hdfs dfs -mkdir -p /user/hive/purchases_data;
+
+CREATE EXTERNAL TABLE purchases (id INT, buyer STRING, purchaseDate STRING)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+LOCATION '/user/hive/purchases_data';
+
+LOAD DATA LOCAL INPATH '/mnt/import/purchases.txt' INTO TABLE purchases;
+
+SELECT * FROM purchases LIMIT 5;
+
+
+INSERT OVERWRITE TABLE books_purchases
+SELECT b.id, b.title, p.buyer, p.purchaseDate
+FROM books b JOIN purchases p ON b.id = p.id;
+
+SELECT * FROM books_purchases LIMIT 10;
+
+
+task2
+
+CREATE TABLE media (id INT, title STRING, releaseDate STRING)
+PARTITIONED BY (type STRING)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+
+LOAD DATA LOCAL INPATH '/mnt/import/media_books.txt' INTO TABLE media PARTITION (type='book');
+LOAD DATA LOCAL INPATH '/mnt/import/media_cds.txt' INTO TABLE media PARTITION (type='cd');
+LOAD DATA LOCAL INPATH '/mnt/import/media_dvds.txt' INTO TABLE media PARTITION (type='dvd');
+
+SELECT * FROM media WHERE type = 'cd';
+SELECT * FROM media WHERE type = 'dvd';
+SELECT * FROM media WHERE type = 'book';
+
+SHOW PARTITIONS media;
+
+
+#in another terminal
+docker exec -it hadoop-hive bash
+hdfs dfs -ls -R /user/hive/warehouse/media
+
+#return back to hive terminal 
+DROP TABLE media;
+
